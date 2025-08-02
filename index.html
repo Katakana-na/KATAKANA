@@ -1,11 +1,28 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>カタカナーシ ゲーム</title>
-  </head>
-  <body>
-    <h1>ようこそ！</h1>
-    <p>このページはテスト公開用です。</p>
-  </body>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>クイズ出題ページ</title>
+  <style>
+    body { font-family: sans-serif; background-color: #fffbe6; text-align: center; padding: 50px; }
+    h2 { color: #333; }
+    button { font-size: 1.2em; padding: 10px 20px; margin-top: 20px; }
+    p { font-size: 1.5em; }
+  </style>
+</head>
+<body>
+  <h2>🎤 出題者用クイズ画面</h2>
+  <p id="word">お題：？？？</p>
+  <button onclick="nextWord()">表示する</button>
+
+  <script>
+    const words = ["グラタン", "ドリア", "タコス", "オムライス", "ミートソース"];
+    let index = 0;
+
+    function nextWord() {
+      document.getElementById("word").textContent = "お題：" + words[index];
+      index = (index + 1) % words.length;
+    }
+  </script>
+</body>
 </html>
