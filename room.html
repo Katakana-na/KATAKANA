@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ルーム作成</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f8f8ff;
+      padding: 2em;
+      text-align: center;
+    }
+    input, button {
+      font-size: 1em;
+      padding: 0.5em;
+      margin: 1em 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>ルーム作成</h2>
+  <p>ニックネームを入力してください：</p>
+  <input type="text" id="nickname" placeholder="例：さやか">
+  <br>
+  <button onclick="createRoom()">ルームを作成</button>
+
+  <script>
+    function createRoom() {
+      const name = document.getElementById('nickname').value.trim();
+      if (name === "") {
+        alert("ニックネームを入力してください");
+        return;
+      }
+      const roomId = Math.random().toString(36).substring(2, 7).toUpperCase();
+      alert(`${name} さんのルームを作成しました！\nルームID: ${roomId}`);
+    }
+  </script>
+</body>
+</html>
