@@ -17,12 +17,10 @@
     const roomId = sessionStorage.getItem("roomId");
     const hostName = "host";
 
-    // データがない場合は room.html に戻す
     if (!nickname || !roomId) {
       location.href = "room.html";
     }
 
-    // 表示内容
     document.getElementById("display-name").textContent =
       `あなた: ${nickname} / ルーム: ${roomId}`;
 
@@ -32,7 +30,7 @@
 
     let questions = [];
 
-    fetch("question.json")
+    fetch("questions.json")
       .then(response => response.json())
       .then(data => {
         questions = data;
