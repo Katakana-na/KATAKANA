@@ -2,29 +2,60 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>クイズワード表示</title>
+  <title>カタカナクイズルーム</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
       padding: 30px;
+      background-color: #f9f9f9;
     }
     #wordDisplay {
-      font-size: 2em;
+      font-size: 2.5em;
       margin: 40px 0;
+      color: #1a73e8;
+      font-weight: bold;
     }
     button {
       padding: 10px 20px;
       font-size: 1em;
+      margin: 10px;
+    }
+    #scoreBoard {
+      margin-top: 30px;
+      text-align: left;
+      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <h1>カタカナワードクイズ</h1>
+  <h1>カタカナワードクイズ🎉</h1>
+  <div id="roomInfo"></div>
+
   <div id="wordDisplay">ワードはここに表示されます</div>
   <button id="showBtn" onclick="showNextWord()" disabled>ワード表示</button>
 
+  <div id="scoreBoard"></div>
+
   <script>
+    // URLパラメータ取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const nickname = urlParams.get("nickname");
+    const roomId = urlParams.get("room");
+
+    // 得点管理
+    let scores = {};
+    scores[nickname] = 0;
+
+    // 表示：ルーム情報と得点
+    document.getElementById("roomInfo").textContent = `ルームID：${roomId}`;
+    const scoreBoard = document.getElementById("scoreBoard");
+    function updateScoreBoard() {
+      scoreBoard.innerHTML = `<strong>参加者一覧</strong><br>${nickname}：${scores[nickname]}点`;
+    }
+    updateScoreBoard();
+
+    // ワード管理
     let usedWords = [];
     let wordPool = [];
 
@@ -35,8 +66,8 @@
         .then(csv => {
           const rows = csv.split("\n");
           wordPool = rows.map(row => row.trim()).filter(word => word);
-          console.log("取得完了:", wordPool); // チェック用表示
-          document.getElementById("showBtn").disabled = false; // ボタン有効化
+          console.log("取得完了:", wordPool);
+          document.getElementById("showBtn").disabled = false;
         })
         .catch(error => {
           console.error("取得エラー:", error);
@@ -47,13 +78,11 @@
       if (usedWords.length >= 100) {
         usedWords = [];
       }
-
       const availableWords = wordPool.filter(word => !usedWords.includes(word));
       if (availableWords.length === 0) {
         document.getElementById("wordDisplay").textContent = "すべて出題済み！";
         return;
       }
-
       const nextWord = availableWords[Math.floor(Math.random() * availableWords.length)];
       usedWords.push(nextWord);
       document.getElementById("wordDisplay").textContent = nextWord;
