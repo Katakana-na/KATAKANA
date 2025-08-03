@@ -2,170 +2,35 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>カタカナクイズ</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      background: #f8f8f8;
-      padding: 20px;
-    }
-    h1 { margin-bottom: 10px; }
-    #wordDisplay {
-      font-size: 2em;
-      font-weight: bold;
-      color: #1a73e8;
-      margin: 20px 0;
-    }
-    #hostDisplay {
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
-    .player {
-      display: inline-block;
-      border: 1px solid #ccc;
-      background: #fff;
-      padding: 10px;
-      margin: 10px;
-      min-width: 120px;
-    }
-    #answerList {
-      text-align: left;
-      display: inline-block;
-      margin-top: 20px;
-    }
-    button {
-      padding: 6px 12px;
-      margin: 4px;
-      cursor: pointer;
-    }
-  </style>
+  <title>クイズ</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>カタカナクイズ🎮</h1>
-  <div id="hostDisplay">出題者：ー</div>
-  <div id="wordDisplay">ここにお題が表示されます</div>
-  <button id="showBtn" onclick="showNextWord()">出題する</button>
-
-  <div id="playersArea"></div>
-  <div id="judgeArea" style="margin-top:20px;">
-    <button onclick="handleCorrect()">正解</button>
-    <button onclick="handleIncorrect()">不正解</button>
-  </div>
-
-  <div id="answerList">
-    <h3>回答順</h3>
-    <ol id="answers"></ol>
-  </div>
+  <h2>クイズゲーム</h2>
+  <p id="display-name"></p>
+  <div id="question-box" style="display:none;"></div>
+  <button id="hostBtn" style="display:none;" onclick="showQuestion()">出題する</button>
+  <button onclick="resetGame()">リセット</button>
 
   <script>
-    // プレイヤー一覧
-    const players = ["ぷら", "かりん", "えむ", "ケロ", "ツナ", "雪見", "hardwood"];
-    let scores = {}, currentHostIndex = 0, currentWord = "";
-    let wordPool = ["バナナ", "スマホ", "カフェ", "ピザ", "ロボット", "スニーカー"];
-    let usedWords = [], answerOrder = [];
+    const nickname = sessionStorage.getItem("nickname");
+    const roomId = sessionStorage.getItem("roomId");
+    const hostName = "host";
 
-    // 初期化
-    players.forEach(name => scores[name] = 0);
+    document.getElementById("display-name").textContent = `あなた: ${nickname} / ルーム: ${roomId}`;
 
-    function updateHostDisplay() {
-      const host = players[currentHostIndex];
-      document.getElementById("hostDisplay").textContent = `出題者：${host}`;
+    if (nickname === hostName) {
+      document.getElementById("hostBtn").style.display = "inline-block";
     }
 
-    function updatePlayersUI() {
-      const area = document.getElementById("playersArea");
-      area.innerHTML = "";
-      players.forEach(name => {
-        const div = document.createElement("div");
-        div.className = "player";
-        div.innerHTML = `
-          <strong>${name}</strong><br>
-          得点：<span id="score-${name}">${scores[name]}</span><br>
-          <button onclick="recordAnswer('${name}')">回答する</button>
-        `;
-        area.appendChild(div);
-      });
+    function showQuestion() {
+      document.getElementById("question-box").textContent = "🎯 お題：たこやき（例）";
+      document.getElementById("question-box").style.display = "block";
     }
 
-    function updateScoresUI() {
-      players.forEach(name => {
-        document.getElementById(`score-${name}`).textContent = scores[name];
-      });
+    function resetGame() {
+      document.getElementById("question-box").style.display = "none";
     }
-
-    function updateAnswerList() {
-      const list = document.getElementById("answers");
-      list.innerHTML = "";
-      answerOrder.forEach(name => {
-        const li = document.createElement("li");
-        li.textContent = name;
-        list.appendChild(li);
-      });
-    }
-
-    function showNextWord() {
-      const host = players[currentHostIndex];
-      const available = wordPool.filter(w => !usedWords.includes(w));
-      if (available.length === 0) {
-        document.getElementById("wordDisplay").textContent = "お題が尽きました！";
-        return;
-      }
-      currentWord = available[Math.floor(Math.random() * available.length)];
-      usedWords.push(currentWord);
-      document.getElementById("wordDisplay").textContent = `【${host}のみ表示中】`;
-      alert(`${host}のお題は「${currentWord}」です`);
-      answerOrder = [];
-      updateAnswerList();
-    }
-
-    function recordAnswer(name) {
-      if (!answerOrder.includes(name)) {
-        answerOrder.push(name);
-        updateAnswerList();
-      }
-    }
-
-    function handleCorrect() {
-      const host = players[currentHostIndex];
-      const answerer = answerOrder[0];
-      if (!answerer) return alert("回答者がいません！");
-      scores[host]++;
-      scores[answerer]++;
-      updateScoresUI();
-      checkWin(host);
-      checkWin(answerer);
-      currentHostIndex = (currentHostIndex + 1) % players.length;
-      updateHostDisplay();
-      document.getElementById("wordDisplay").textContent = "次の問題へどうぞ！";
-    }
-
-    function handleIncorrect() {
-      const next = answerOrder[1];
-      if (next) {
-        currentHostIndex = players.indexOf(next);
-        updateHostDisplay();
-        alert(`不正解！次の出題者は「${next}」`);
-        document.getElementById("wordDisplay").textContent = "出題を開始してください";
-      } else {
-        alert("全員不正解！次のお題へ");
-        currentHostIndex = (currentHostIndex + 1) % players.length;
-        updateHostDisplay();
-        showNextWord();
-      }
-    }
-
-    function checkWin(name) {
-      if (scores[name] >= 10) {
-        alert(`🎉 ${name} が10点で優勝！ゲーム終了`);
-      }
-    }
-
-    window.onload = () => {
-      updateHostDisplay();
-      updatePlayersUI();
-      updateScoresUI();
-    };
   </script>
 </body>
 </html>
