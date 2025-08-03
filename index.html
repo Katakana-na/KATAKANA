@@ -2,27 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>クイズ出題ページ</title>
-  <style>
-    body { font-family: sans-serif; background-color: #fffbe6; text-align: center; padding: 50px; }
-    h2 { color: #333; }
-    button { font-size: 1.2em; padding: 10px 20px; margin-top: 20px; }
-    p { font-size: 1.5em; }
-  </style>
+  <title>KATAKANA クイズゲーム</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>🎤 出題者用クイズ画面</h2>
-  <p id="word">お題：？？？</p>
-  <button onclick="nextWord()">表示する</button>
-
-  <script>
-    const words = ["グラタン", "ドリア", "タコス", "オムライス", "ミートソース"];
-    let index = 0;
-
-    function nextWord() {
-      document.getElementById("word").textContent = "お題：" + words[index];
-      index = (index + 1) % words.length;
-    }
-  </script>
+  <h1>KATAKANA クイズゲームへようこそ！</h1>
+  <p>出題者はルームを作成、参加者はルームIDで参加してください。</p>
+  <a href="room.html"><button>ルームを作成する</button></a>
+  <a href="join.html"><button>ルームに参加する</button></a>
 </body>
 </html>
