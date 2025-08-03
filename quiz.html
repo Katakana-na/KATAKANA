@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>クイズ出題画面</title>
+</head>
+<body>
+  <h1>出題者画面</h1>
+  <button onclick="showNextWord()">ワード表示</button>
+  <p id="wordDisplay"></p>
+
+  <script>
+    let usedWords = [];
+    let wordPool = ["サンプル1", "サンプル2", "サンプル3"]; // あとでGoogle Sheetsから取得に切り替え
+
+    function showNextWord() {
+      if (usedWords.length >= 100) {
+        usedWords = [];
+      }
+
+      const availableWords = wordPool.filter(word => !usedWords.includes(word));
+      if (availableWords.length === 0) {
+        document.getElementById("wordDisplay").textContent = "すべて出題済み！";
+        return;
+      }
+
+      const nextWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+      usedWords.push(nextWord);
+      document.getElementById("wordDisplay").textContent = nextWord;
+    }
+  </script>
+</body>
+</html>
