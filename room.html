@@ -6,17 +6,17 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h2>ルーム作成（出題者）</h2>
-  <input type="text" id="nickname" placeholder="ニックネーム（出題者）" />
-  <button onclick="createRoom()">作成</button>
+  <h1>ルーム作成</h1>
+  <input type="text" id="nickname" placeholder="ニックネームを入力" />
+  <button onclick="createRoom()">ルーム作成</button>
 
   <script>
     function createRoom() {
-      const nickname = document.getElementById("nickname").value.trim() || "host";
-      const roomId = Math.floor(Math.random() * 100000).toString().padStart(5, "0");
-      sessionStorage.setItem("nickname", nickname);
-      sessionStorage.setItem("roomId", roomId);
-      location.href = "quiz.html";
+      const nickname = document.getElementById("nickname").value;
+      const roomId = Date.now().toString();
+      localStorage.setItem("nickname", nickname);
+      localStorage.setItem("roomId", roomId);
+      window.location.href = `quiz.html?roomId=${roomId}`;
     }
   </script>
 </body>
