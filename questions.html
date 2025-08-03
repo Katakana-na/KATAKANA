@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>問題編集ページ</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    let questions = [];
+
+    async function loadQuestions() {
+      const res = await fetch("questions.json");
+      questions = await res.json();
+      renderQuestions();
+    }
+
+    function renderQuestions() {
+      questions.sort((a, b) => a.question.localeCompare(b.question, 'ja'));
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      questions.forEach((q, i) => {
+        list.innerHTML += `
+          <li>
+            ${q.question}
+            <button onclick="deleteQuestion(${i})">🗑️削除</button>
+          </li>
+        `;
+      });
+    }
+
+    function addQuestion() {
+      const input = document.getElementById("qInput");
+      const text = input.value.trim();
+      if (!text) return;
+      questions.push({ question: text });
+      input.value = "";
+      renderQuestions();
+    }
+
+    function deleteQuestion(index) {
+      questions.splice(index, 1);
+      renderQuestions();
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(questions, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "questions.json";
+      link.click();
+    }
+  </script>
+</head>
+<body onload="loadQuestions()">
+  <h1>📝 問題編集ページ</h1>
+  <input type="text" id="qInput" placeholder="問題を入力">
+  <button onclick="addQuestion()">追加</button>
+  <button onclick="exportJSON()">保存（JSONダウンロード）</button>
+  <ul id="list"></ul>
+</body>
+</html>
