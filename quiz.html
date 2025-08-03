@@ -2,17 +2,17 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>カタカナクイズルーム</title>
+  <title>カタカナクイズ</title>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
       padding: 30px;
-      background-color: #f9f9f9;
+      background-color: #f5f5f5;
     }
     #wordDisplay {
       font-size: 2.5em;
-      margin: 40px 0;
+      margin: 30px 0;
       color: #1a73e8;
       font-weight: bold;
     }
@@ -20,42 +20,75 @@
       padding: 10px 20px;
       font-size: 1em;
       margin: 10px;
+      cursor: pointer;
     }
-    #scoreBoard {
+    #scoreBoard, #answerList {
       margin-top: 30px;
       text-align: left;
       display: inline-block;
+    }
+    #roomInfo {
+      margin-bottom: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <h1>カタカナワードクイズ🎉</h1>
   <div id="roomInfo"></div>
-
   <div id="wordDisplay">ワードはここに表示されます</div>
-  <button id="showBtn" onclick="showNextWord()" disabled>ワード表示</button>
+  <button id="showBtn" onclick="showNextWord()" disabled>出題する</button>
+
+  <div id="judgeArea">
+    <button onclick="handleCorrect()">正解</button>
+    <button onclick="handleIncorrect()">不正解</button>
+  </div>
 
   <div id="scoreBoard"></div>
+  <div id="answerList">
+    <h3>回答順</h3>
+    <ol id="answers"></ol>
+  </div>
 
   <script>
-    // URLパラメータ取得
+    // ▼ 参加者情報を取得
     const urlParams = new URLSearchParams(window.location.search);
     const nickname = urlParams.get("nickname");
     const roomId = urlParams.get("room");
 
-    // 得点管理
+    // ▼ 表示：ルームID
+    document.getElementById("roomInfo").textContent = `ルームID：${roomId}`;
+
+    // ▼ 得点管理
     let scores = {};
     scores[nickname] = 0;
 
-    // 表示：ルーム情報と得点
-    document.getElementById("roomInfo").textContent = `ルームID：${roomId}`;
-    const scoreBoard = document.getElementById("scoreBoard");
-    function updateScoreBoard() {
-      scoreBoard.innerHTML = `<strong>参加者一覧</strong><br>${nickname}：${scores[nickname]}点`;
-    }
-    updateScoreBoard();
+    // ▼ 回答順記録
+    let answerOrder = [];
 
-    // ワード管理
+    // ▼ 得点＆参加者表示更新
+    function updateScoreBoard() {
+      const board = document.getElementById("scoreBoard");
+      board.innerHTML = "<h3>得点一覧</h3>";
+      for (let name in scores) {
+        const div = document.createElement("div");
+        div.textContent = `${name}：${scores[name]}点`;
+        board.appendChild(div);
+      }
+    }
+
+    // ▼ 回答順表示更新
+    function updateAnswerOrder() {
+      const list = document.getElementById("answers");
+      list.innerHTML = "";
+      answerOrder.forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        list.appendChild(li);
+      });
+    }
+
+    // ▼ ワード管理
     let usedWords = [];
     let wordPool = [];
 
@@ -66,7 +99,6 @@
         .then(csv => {
           const rows = csv.split("\n");
           wordPool = rows.map(row => row.trim()).filter(word => word);
-          console.log("取得完了:", wordPool);
           document.getElementById("showBtn").disabled = false;
         })
         .catch(error => {
@@ -75,20 +107,57 @@
     }
 
     function showNextWord() {
-      if (usedWords.length >= 100) {
-        usedWords = [];
-      }
-      const availableWords = wordPool.filter(word => !usedWords.includes(word));
-      if (availableWords.length === 0) {
+      const available = wordPool.filter(word => !usedWords.includes(word));
+      if (available.length === 0) {
         document.getElementById("wordDisplay").textContent = "すべて出題済み！";
         return;
       }
-      const nextWord = availableWords[Math.floor(Math.random() * availableWords.length)];
-      usedWords.push(nextWord);
-      document.getElementById("wordDisplay").textContent = nextWord;
+      const next = available[Math.floor(Math.random() * available.length)];
+      usedWords.push(next);
+      document.getElementById("wordDisplay").textContent = next;
+
+      // 回答順・出題ターンリセット（仮で自分）
+      answerOrder = [];
+      updateAnswerOrder();
     }
 
-    window.onload = fetchWordsFromSheet;
+    function handleCorrect() {
+      // 仮：自分が出題者かつ回答者
+      const answerer = nickname;
+      scores[nickname] += 1; // 出題者にも得点
+      scores[answerer] = (scores[answerer] || 0) + 1;
+      updateScoreBoard();
+      checkWin();
+    }
+
+    function handleIncorrect() {
+      alert("不正解！次の出題者に交代してください");
+      // 出題者ローテーションなどの拡張はここで
+    }
+
+    function checkWin() {
+      for (let name in scores) {
+        if (scores[name] >= 10) {
+          alert(`${name}が優勝！🎉 ゲーム終了`);
+        }
+      }
+    }
+
+    // ▼ 回答ボタン（仮）
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        // 回答順に登録（仮で自分）
+        if (!answerOrder.includes(nickname)) {
+          answerOrder.push(nickname);
+          updateAnswerOrder();
+        }
+      }
+    });
+
+    window.onload = () => {
+      fetchWordsFromSheet();
+      updateScoreBoard();
+    };
   </script>
 </body>
 </html>
