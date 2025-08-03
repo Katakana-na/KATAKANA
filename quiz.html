@@ -15,17 +15,31 @@
   <script>
     const nickname = sessionStorage.getItem("nickname");
     const roomId = sessionStorage.getItem("roomId");
-    const hostName = "host";
+    const hostName = "host"; // 出題者のニックネーム（固定）
 
     document.getElementById("display-name").textContent = `あなた: ${nickname} / ルーム: ${roomId}`;
 
+    // 出題者だけに出題ボタンを表示
     if (nickname === hostName) {
       document.getElementById("hostBtn").style.display = "inline-block";
     }
 
+    // Google Sheetsからお題を取得する関数
     function showQuestion() {
-      document.getElementById("question-box").textContent = "🎯 お題：たこやき（例）";
-      document.getElementById("question-box").style.display = "block";
+      fetch("https://docs.google.com/spreadsheets/d/1pH548uz07eio47oxgPMPjq7zAWOuls2eihG9D2E0HvU/gviz/tq?tqx=out:json")
+        .then(res => res.text())
+        .then(text => {
+          const json = JSON.parse(text.substr(47).slice(0, -2));
+          const rows = json.table.rows.map(r => r.c[0]?.v).filter(Boolean); // A列の値だけ抽出
+          const random = rows[Math.floor(Math.random() * rows.length)];
+          document.getElementById("question-box").textContent = `🎯 お題：${random}`;
+          document.getElementById("question-box").style.display = "block";
+        })
+        .catch(err => {
+          console.error("取得エラー:", err);
+          document.getElementById("question-box").textContent = "⚠️ お題の取得に失敗しました";
+          document.getElementById("question-box").style.display = "block";
+        });
     }
 
     function resetGame() {
