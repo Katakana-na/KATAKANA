@@ -1,81 +1,35 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>クイズルーム</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
-    .player { margin: 10px 0; padding: 10px; background: #fff; border-radius: 8px; }
-    .question { margin: 20px 0; font-size: 18px; font-weight: bold; }
-    .score { font-size: 16px; }
-  </style>
+  <meta charset="UTF-8">
+  <title>クイズ</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🧠 クイズ部屋</h1>
-
-  <div>
-    <input type="text" id="playerNameInput" placeholder="プレイヤー名" />
-    <button onclick="addPlayer()">参加する</button>
-    <button onclick="clearPlayers()">リセット</button>
-  </div>
-
-  <div id="playersList"></div>
-
-  <div class="question">
-    <button onclick="fetchQuestion()">🗣 出題する</button>
-    <p id="questionText">ここにお題が表示されます</p>
-  </div>
+  <h2>クイズゲーム</h2>
+  <p id="display-name"></p>
+  <div id="question-box" style="display:none;"></div>
+  <button id="hostBtn" style="display:none;" onclick="showQuestion()">出題する</button>
+  <button onclick="resetGame()">リセット</button>
 
   <script>
-    let players = [];
+    const nickname = sessionStorage.getItem("nickname");
+    const roomId = sessionStorage.getItem("roomId");
+    const hostName = "host";
 
-    function addPlayer() {
-      const name = document.getElementById("playerNameInput").value.trim();
-      if (!name) return;
-      const player = { name, score: 0 };
-      players.push(player);
-      renderPlayers();
-      document.getElementById("playerNameInput").value = "";
+    document.getElementById("display-name").textContent = `あなた: ${nickname} / ルーム: ${roomId}`;
+
+    if (nickname === hostName) {
+      document.getElementById("hostBtn").style.display = "inline-block";
     }
 
-    function clearPlayers() {
-      players = [];
-      renderPlayers();
+    function showQuestion() {
+      document.getElementById("question-box").textContent = "🎯 お題：たこやき（例）";
+      document.getElementById("question-box").style.display = "block";
     }
 
-    function renderPlayers() {
-      const list = document.getElementById("playersList");
-      list.innerHTML = "";
-      players.forEach((player, i) => {
-        const div = document.createElement("div");
-        div.className = "player";
-        div.innerHTML = `
-          <strong>${player.name}</strong>
-          <span class="score">得点: ${player.score}</span><br>
-          <button onclick="answer(${i})">回答する</button>
-          <button onclick="changeScore(${i}, 1)">＋得点</button>
-          <button onclick="changeScore(${i}, -1)">−得点</button>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    function changeScore(index, delta) {
-      players[index].score += delta;
-      renderPlayers();
-    }
-
-    function answer(index) {
-      alert(`${players[index].name} が回答しました！`);
-      // 正解時の得点処理例（出題者＋回答者に1点）
-      changeScore(index, 1); // 回答者に1点
-    }
-
-    function fetchQuestion() {
-      // Google Sheets 連携部分の仮コード
-      document.getElementById("questionText").textContent = "例題：りんごの色は？";
-      // 実装するならここに API 読み込み処理を追加
+    function resetGame() {
+      document.getElementById("question-box").style.display = "none";
     }
   </script>
 </body>
