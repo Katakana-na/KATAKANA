@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head><title>ルームに参加</title></head>
+  <body>
+    <h2>ルームに参加する</h2>
+    <input id="nicknameInput" placeholder="ニックネーム">
+    <input id="roomIdInput" placeholder="ルームID">
+    <button onclick="joinRoom()">参加する</button>
+
+    <script>
+      function joinRoom() {
+        const nickname = document.getElementById("nicknameInput").value;
+        const roomId = document.getElementById("roomIdInput").value;
+        window.location.href = `quiz.html?nickname=${nickname}&room=${roomId}`;
+      }
+    </script>
+  </body>
+</html>
