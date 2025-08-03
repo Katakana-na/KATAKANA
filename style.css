@@ -3,18 +3,26 @@ body {
   padding: 20px;
 }
 button {
-  margin: 10px;
-  padding: 10px 20px;
+  margin: 5px;
+  padding: 8px 15px;
+  font-size: 1em;
 }
 #questionArea {
-  margin-top: 20px;
+  margin-top: 15px;
   font-size: 1.2em;
 }
-#scoreBoard {
-  margin-top: 30px;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+th, td {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 8px;
 }
 #winnerArea {
-  font-size: 1.5em;
+  font-size: 1.4em;
   color: green;
   margin-top: 20px;
 }
