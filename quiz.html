@@ -1,60 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>クイズ</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>クイズ画面</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h2>クイズゲーム</h2>
-  <p id="display-name"></p>
-  <div id="question-box" style="display:none;"></div>
-  <button id="hostBtn" style="display:none;" onclick="showQuestion()">出題する</button>
-  <button onclick="resetGame()">リセット</button>
+  <h1>クイズゲーム</h1>
+  <div id="info">
+    <p>ホスト名：<span id="hostName"></span></p>
+    <p>ルームID：<span id="roomID"></span></p>
+  </div>
 
-  <script>
-    const nickname = sessionStorage.getItem("nickname");
-    const roomId = sessionStorage.getItem("roomId");
-    const hostName = "host";
+  <button id="showQuestionBtn">出題する</button>
+  <div id="questionArea">ここにお題が表示されます</div>
 
-    if (!nickname || !roomId) {
-      location.href = "room.html";
-    }
+  <div id="answerSection">
+    <button onclick="recordAnswer()">回答する</button>
+    <div id="answerOrder"></div>
+  </div>
 
-    document.getElementById("display-name").textContent =
-      `あなた: ${nickname} / ルーム: ${roomId}`;
+  <div id="judgeSection">
+    <button onclick="judge(true)">正解</button>
+    <button onclick="judge(false)">不正解</button>
+  </div>
 
-    if (nickname === hostName) {
-      document.getElementById("hostBtn").style.display = "inline-block";
-    }
+  <div id="scoreBoard"></div>
+  <div id="winnerArea"></div>
 
-    let questions = [];
-
-    fetch("questions.json")
-      .then(response => response.json())
-      .then(data => {
-        questions = data;
-      })
-      .catch(error => {
-        console.error("問題データの読み込みに失敗しました:", error);
-      });
-
-    function showQuestion() {
-      if (questions.length === 0) {
-        document.getElementById("question-box").textContent =
-          "問題データが読み込まれていません。";
-      } else {
-        const randomIndex = Math.floor(Math.random() * questions.length);
-        const selected = questions[randomIndex];
-        document.getElementById("question-box").textContent =
-          `🎯 お題：${selected.question}`;
-      }
-      document.getElementById("question-box").style.display = "block";
-    }
-
-    function resetGame() {
-      document.getElementById("question-box").style.display = "none";
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
