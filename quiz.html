@@ -1,37 +1,65 @@
-<script>
-  let usedWords = [];
-  let wordPool = [];
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>クイズワード表示</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    #wordDisplay {
+      font-size: 2em;
+      margin: 40px 0;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>カタカナワードクイズ</h1>
+  <div id="wordDisplay">ワードはここに表示されます</div>
+  <button id="showBtn" onclick="showNextWord()" disabled>ワード表示</button>
 
-  function fetchWordsFromSheet() {
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/1pH548uz07eio47oxgPMPjq7zAWOuls2eihG9D2E0HvU/export?format=csv&gid=0";
-    fetch(sheetUrl)
-      .then(response => response.text())
-      .then(csv => {
-        const rows = csv.split("\n");
-        wordPool = rows.map(row => row.trim()).filter(word => word);
-        console.log("取得完了:", wordPool); // チェック用表示
-        document.getElementById("showBtn").disabled = false; // ボタン有効化
-      })
-      .catch(error => {
-        console.error("取得エラー:", error);
-      });
-  }
+  <script>
+    let usedWords = [];
+    let wordPool = [];
 
-  function showNextWord() {
-    if (usedWords.length >= 100) {
-      usedWords = [];
+    function fetchWordsFromSheet() {
+      const sheetUrl = "https://docs.google.com/spreadsheets/d/1pH548uz07eio47oxgPMPjq7zAWOuls2eihG9D2E0HvU/export?format=csv&gid=0";
+      fetch(sheetUrl)
+        .then(response => response.text())
+        .then(csv => {
+          const rows = csv.split("\n");
+          wordPool = rows.map(row => row.trim()).filter(word => word);
+          console.log("取得完了:", wordPool); // チェック用表示
+          document.getElementById("showBtn").disabled = false; // ボタン有効化
+        })
+        .catch(error => {
+          console.error("取得エラー:", error);
+        });
     }
 
-    const availableWords = wordPool.filter(word => !usedWords.includes(word));
-    if (availableWords.length === 0) {
-      document.getElementById("wordDisplay").textContent = "すべて出題済み！";
-      return;
+    function showNextWord() {
+      if (usedWords.length >= 100) {
+        usedWords = [];
+      }
+
+      const availableWords = wordPool.filter(word => !usedWords.includes(word));
+      if (availableWords.length === 0) {
+        document.getElementById("wordDisplay").textContent = "すべて出題済み！";
+        return;
+      }
+
+      const nextWord = availableWords[Math.floor(Math.random() * availableWords.length)];
+      usedWords.push(nextWord);
+      document.getElementById("wordDisplay").textContent = nextWord;
     }
 
-    const nextWord = availableWords[Math.floor(Math.random() * availableWords.length)];
-    usedWords.push(nextWord);
-    document.getElementById("wordDisplay").textContent = nextWord;
-  }
-
-  window.onload = fetchWordsFromSheet;
-</script>
+    window.onload = fetchWordsFromSheet;
+  </script>
+</body>
+</html>
