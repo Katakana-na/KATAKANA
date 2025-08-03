@@ -8,7 +8,12 @@
       .then(response => response.text())
       .then(csv => {
         const rows = csv.split("\n");
-        wordPool = rows.map(row => row.trim()).filter(word => word); // 空行を除外
+        wordPool = rows.map(row => row.trim()).filter(word => word);
+        console.log("取得完了:", wordPool); // チェック用表示
+        document.getElementById("showBtn").disabled = false; // ボタン有効化
+      })
+      .catch(error => {
+        console.error("取得エラー:", error);
       });
   }
 
