@@ -25,9 +25,15 @@
     <button onclick="judge(false)">不正解</button>
   </div>
 
-  <div id="scoreBoard"></div>
-  <div id="winnerArea"></div>
+  <h2>参加者一覧と得点</h2>
+  <table id="scoreTable">
+    <thead>
+      <tr><th>名前</th><th>得点</th><th>＋</th><th>−</th></tr>
+    </thead>
+    <tbody id="scoreBody"></tbody>
+  </table>
 
+  <div id="winnerArea"></div>
   <script src="script.js"></script>
 </body>
 </html>
