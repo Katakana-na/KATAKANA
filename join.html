@@ -1,18 +1,26 @@
 <!DOCTYPE html>
-<html>
-  <head><title>ルームに参加</title></head>
-  <body>
-    <h2>ルームに参加する</h2>
-    <input id="nicknameInput" placeholder="ニックネーム">
-    <input id="roomIdInput" placeholder="ルームID">
-    <button onclick="joinRoom()">参加する</button>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>参加する</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>ルームに参加</h2>
+  <input type="text" id="nickname" placeholder="ニックネーム">
+  <input type="text" id="roomId" placeholder="ルームID">
+  <button onclick="joinRoom()">参加</button>
 
-    <script>
-      function joinRoom() {
-        const nickname = document.getElementById("nicknameInput").value;
-        const roomId = document.getElementById("roomIdInput").value;
-        window.location.href = `quiz.html?nickname=${nickname}&room=${roomId}`;
+  <script>
+    function joinRoom() {
+      const nickname = document.getElementById("nickname").value;
+      const roomId = document.getElementById("roomId").value;
+      if (nickname && roomId) {
+        sessionStorage.setItem("nickname", nickname);
+        sessionStorage.setItem("roomId", roomId);
+        location.href = "quiz.html";
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
