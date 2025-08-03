@@ -32,22 +32,48 @@ function recordAnswer() {
   if (!name) return;
   answerOrder.push(name);
   document.getElementById("answerOrder").textContent = "回答順：" + answerOrder.join(" → ");
+  if (!scores[name]) {
+    scores[name] = 0;
+    addToScoreTable(name);
+  }
 }
 
 function judge(isCorrect) {
   if (answerOrder.length === 0) return;
   const answerer = answerOrder.shift();
   if (isCorrect) {
-    scores[answerer] = (scores[answerer] || 0) + 1;
-    scores[hostName] = (scores[hostName] || 0) + 1;
+    scores[answerer]++;
+    scores[hostName] = scores[hostName] || 0;
+    scores[hostName]++;
   }
+  updateScores();
+  checkWinner();
+  document.getElementById("answerOrder").textContent = "回答順：" + answerOrder.join(" → ");
+}
+
+function addToScoreTable(name) {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${name}</td>
+    <td id="score-${name}">0</td>
+    <td><button onclick="adjustScore('${name}', 1)">＋</button></td>
+    <td><button onclick="adjustScore('${name}', -1)">−</button></td>
+  `;
+  document.getElementById("scoreBody").appendChild(row);
+}
+
+function adjustScore(name, delta) {
+  scores[name] = (scores[name] || 0) + delta;
+  if (scores[name] < 0) scores[name] = 0;
   updateScores();
   checkWinner();
 }
 
 function updateScores() {
-  const board = Object.entries(scores).map(([name, score]) => `${name}: ${score}点`);
-  document.getElementById("scoreBoard").innerHTML = board.join("<br>");
+  for (let name in scores) {
+    const cell = document.getElementById(`score-${name}`);
+    if (cell) cell.textContent = scores[name];
+  }
 }
 
 function checkWinner() {
