@@ -12,8 +12,8 @@
 
   <script>
     function createRoom() {
-      const nickname = document.getElementById("nickname").value || "host";
-      const roomId = Math.floor(Math.random() * 100000);
+      const nickname = document.getElementById("nickname").value.trim() || "host";
+      const roomId = Math.floor(Math.random() * 100000).toString().padStart(5, "0");
       sessionStorage.setItem("nickname", nickname);
       sessionStorage.setItem("roomId", roomId);
       location.href = "quiz.html";
