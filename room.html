@@ -1,22 +1,15 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <title>ルーム作成</title>
-</head>
+<head><meta charset="UTF-8"><title>ルーム開始</title><link rel="stylesheet" href="style.css"></head>
 <body>
-  <h1>クイズルームに参加</h1>
-  <input type="text" id="nicknameInput" placeholder="あなたの名前を入力" />
-  <button id="joinBtn">参加する</button>
-
+  <h1>ルーム開始準備</h1>
+  <p>ルームID: <span id="roomDisplay"></span></p>
+  <button onclick="start()">クイズを始める</button>
   <script>
-    document.getElementById("joinBtn").addEventListener("click", () => {
-      const nickname = document.getElementById("nicknameInput").value.trim();
-      if (nickname === "") return alert("名前を入力してください");
-      localStorage.setItem("nickname", nickname);
-      const roomId = Date.now();
-      window.location.href = `quiz.html?roomId=${roomId}`;
-    });
+    document.getElementById("roomDisplay").textContent = localStorage.getItem("roomID") || "未設定";
+    function start() {
+      location.href = "quiz.html";
+    }
   </script>
 </body>
 </html>
