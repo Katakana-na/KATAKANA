@@ -3,21 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <title>ルーム作成</title>
-  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>ルーム作成</h1>
-  <input type="text" id="nickname" placeholder="ニックネームを入力" />
-  <button onclick="createRoom()">ルーム作成</button>
+  <h1>クイズルームに参加</h1>
+  <input type="text" id="nicknameInput" placeholder="あなたの名前を入力" />
+  <button id="joinBtn">参加する</button>
 
   <script>
-    function createRoom() {
-      const nickname = document.getElementById("nickname").value;
-      const roomId = Date.now().toString();
+    document.getElementById("joinBtn").addEventListener("click", () => {
+      const nickname = document.getElementById("nicknameInput").value.trim();
+      if (nickname === "") return alert("名前を入力してください");
       localStorage.setItem("nickname", nickname);
-      localStorage.setItem("roomId", roomId);
+      const roomId = Date.now(); // 仮のルームID生成
       window.location.href = `quiz.html?roomId=${roomId}`;
-    }
+    });
   </script>
 </body>
 </html>
