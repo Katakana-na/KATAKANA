@@ -6,13 +6,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>名前を入力</h1>
+  <h1>名前を入力して参加</h1>
   <input type="text" id="name" placeholder="名前">
   <button onclick="join()">参加する</button>
 
   <script>
     const params = new URLSearchParams(location.search);
     const roomID = params.get("roomID");
+
+    if (!roomID) {
+      alert("有効なルームURLからアクセスしてください");
+    }
 
     function join() {
       const name = document.getElementById("name").value.trim();
@@ -21,7 +25,7 @@
         localStorage.setItem("roomID", roomID);
         location.href = "room.html";
       } else {
-        alert("名前とルームIDが必要です");
+        alert("名前を入力してください");
       }
     }
   </script>
