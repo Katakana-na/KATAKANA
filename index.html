@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="UTF-8"><title>カタカナクイズ</title><link rel="stylesheet" href="style.css"></head>
+<head>
+  <meta charset="UTF-8">
+  <title>カタカナクイズ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
-  <h1>カタカナクイズへようこそ</h1>
-  <button onclick="createRoom()">ルーム作成</button>
-  <script>
-    function createRoom() {
-      const roomID = Math.random().toString(36).substring(2, 8);
-      location.href = `join.html?room=${roomID}`;
-    }
-  </script>
+  <h1>カタカナクイズへようこそ！</h1>
+  <button onclick="location.href='create.html'">ルームを作成する</button>
 </body>
 </html>
