@@ -1,106 +1,51 @@
-let questions = [];
-let usedQuestions = new Set();
-let answerOrder = [];
-let scores = {};
-let currentQuestion = null;
-let questionActive = false;
+const nickname = localStorage.getItem("nickname");
+const roomId = new URLSearchParams(window.location.search).get("roomId");
 
-const hostName = localStorage.getItem("nickname") || "ホスト";
-const roomID = localStorage.getItem("roomId") || "未設定";
-document.getElementById("hostName").textContent = hostName;
-document.getElementById("roomID").textContent = roomID;
+const players = new Set();
+const answerOrder = [];
+let isQuestionActive = false;
 
-fetch("questions.json")
-  .then(res => res.json())
-  .then(data => questions = data);
-
-const showQuestionBtn = document.getElementById("showQuestionBtn");
-showQuestionBtn.addEventListener("click", () => {
-  if (questionActive) return;
-
-  let unused = questions.filter(q => !usedQuestions.has(q.question));
-  if (unused.length === 0) {
-    alert("すべての問題を出題しました！");
-    return;
+document.addEventListener("DOMContentLoaded", () => {
+  if (nickname) {
+    players.add(nickname);
+    updatePlayerList();
   }
 
-  const random = unused[Math.floor(Math.random() * unused.length)];
-  currentQuestion = random.question;
-  usedQuestions.add(currentQuestion);
-  answerOrder = [];
-  updateAnswerOrder();
+  document.getElementById("answerBtn").addEventListener("click", () => {
+    if (!isQuestionActive || answerOrder.includes(nickname)) return;
+    answerOrder.push(nickname);
+    updateAnswerOrder();
+  });
 
-  alert(`出題：\n${currentQuestion}`); // 出題者にだけ表示
-  document.getElementById("questionArea").textContent = "問題が表示されました（出題者にのみ）";
+  document.getElementById("judgeCorrect").addEventListener("click", () => {
+    endQuestion();
+  });
 
-  questionActive = true;
-  showQuestionBtn.disabled = true;
+  document.getElementById("judgeIncorrect").addEventListener("click", () => {
+    endQuestion();
+  });
+
+  startNewQuestion();
 });
 
-function recordAnswer() {
-  const name = prompt("あなたの名前を入力してください");
-  if (!name) return;
-
-  if (!scores[name]) {
-    scores[name] = 0;
-    addToScoreTable(name);
-  }
-
-  answerOrder.push(name);
-  updateAnswerOrder();
+function updatePlayerList() {
+  const container = document.getElementById("playerList");
+  container.innerHTML = `<h2>参加者</h2><ul>${[...players].map(p => `<li>${p}</li>`).join('')}</ul>`;
 }
 
 function updateAnswerOrder() {
-  const display = answerOrder.length > 0 ? answerOrder.join(" → ") : "なし";
-  document.getElementById("answerOrder").textContent = "回答順：" + display;
+  const container = document.getElementById("answerOrder");
+  container.innerHTML = `<h2>回答順</h2><ol>${answerOrder.map(name => `<li>${name}</li>`).join('')}</ol>`;
 }
 
-function judge(isCorrect) {
-  if (!questionActive || answerOrder.length === 0) return;
-
-  const answerer = answerOrder.shift();
-  if (isCorrect) {
-    scores[answerer]++;
-    scores[hostName] = (scores[hostName] || 0) + 1;
-  }
-
-  updateScores();
+function startNewQuestion() {
+  isQuestionActive = true;
+  answerOrder.length = 0;
   updateAnswerOrder();
-  checkWinner();
-
-  questionActive = false;
-  showQuestionBtn.disabled = false;
+  document.getElementById("questionArea").innerText = "出題：『東京の都庁がある区は？』";
 }
 
-function addToScoreTable(name) {
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td>${name}</td>
-    <td id="score-${name}">0</td>
-    <td><button onclick="adjustScore('${name}', 1)">＋</button></td>
-    <td><button onclick="adjustScore('${name}', -1)">−</button></td>
-  `;
-  document.getElementById("scoreBody").appendChild(row);
-}
-
-function adjustScore(name, delta) {
-  scores[name] = (scores[name] || 0) + delta;
-  if (scores[name] < 0) scores[name] = 0;
-  updateScores();
-  checkWinner();
-}
-
-function updateScores() {
-  for (let name in scores) {
-    const cell = document.getElementById(`score-${name}`);
-    if (cell) cell.textContent = scores[name];
-  }
-}
-
-function checkWinner() {
-  for (let name in scores) {
-    if (scores[name] >= 10) {
-      document.getElementById("winnerArea").textContent = `${name} が優勝しました！🎉`;
-    }
-  }
+function endQuestion() {
+  isQuestionActive = false;
+  document.getElementById("questionArea").innerText = "出題終了";
 }
