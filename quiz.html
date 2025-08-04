@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <title>クイズ画面</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+<head><meta charset="UTF-8"><title>クイズルーム</title><link rel="stylesheet" href="style.css"></head>
 <body>
-  <h1>クイズに挑戦！</h1>
-  <div id="playerList"></div>
-  <div id="scoreBoard"></div>
-  <div id="questionArea">出題前</div>
-  <button id="startQuestion">出題する</button>
-  <button id="answerBtn">解答する</button>
-  <button id="judgeCorrect">正解</button>
-  <button id="judgeIncorrect">不正解</button>
-  <div id="answerOrder"></div>
-
+  <h1>カタカナクイズ</h1>
+  <p>ルームID: <span id="roomDisplay"></span></p>
+  <div id="players"></div>
+  <button onclick="startQuestion()">出題する</button>
+  <div id="question"></div>
+  <button onclick="answer()">回答する</button>
+  <div id="answers"></div>
+  <div>
+    <button onclick="correct()">正解</button>
+    <button onclick="incorrect()">不正解</button>
+  </div>
+  <div id="winner"></div>
   <script src="script.js"></script>
 </body>
 </html>
