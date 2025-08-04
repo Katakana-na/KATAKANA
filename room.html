@@ -14,7 +14,7 @@
       const nickname = document.getElementById("nicknameInput").value.trim();
       if (nickname === "") return alert("名前を入力してください");
       localStorage.setItem("nickname", nickname);
-      const roomId = Date.now(); // 仮のルームID生成
+      const roomId = Date.now();
       window.location.href = `quiz.html?roomId=${roomId}`;
     });
   </script>
