@@ -2,39 +2,18 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>クイズ画面</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>クイズゲーム</h1>
-
-  <div id="info">
-    <p>ホスト名：<span id="hostName"></span></p>
-    <p>ルームID：<span id="roomID"></span></p>
-  </div>
-
-  <button id="showQuestionBtn">出題する</button>
-  <div id="questionArea">ここにお題が表示されます</div>
-
-  <h2>回答アクション</h2>
-  <button onclick="recordAnswer()">回答する</button>
-  <p id="answerOrder">回答順：なし</p>
-
-  <div id="judgeSection">
-    <button onclick="judge(true)">正解</button>
-    <button onclick="judge(false)">不正解</button>
-  </div>
-
-  <h2>プレイヤー一覧と得点</h2>
-  <table id="scoreTable">
-    <thead>
-      <tr><th>名前</th><th>得点</th><th>＋</th><th>−</th></tr>
-    </thead>
-    <tbody id="scoreBody"></tbody>
-  </table>
-
-  <div id="winnerArea"></div>
-
+  <h1>クイズに挑戦！</h1>
+  <div id="playerList"></div>
+  <div id="questionArea"></div>
+  <button id="answerBtn">解答する</button>
+  <button id="judgeCorrect">正解</button>
+  <button id="judgeIncorrect">不正解</button>
+  <div id="answerOrder"></div>
   <script src="script.js"></script>
 </body>
 </html>
