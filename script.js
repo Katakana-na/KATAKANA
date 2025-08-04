@@ -3,9 +3,10 @@ let usedQuestions = new Set();
 let answerOrder = [];
 let scores = {};
 let currentQuestion = null;
+let questionActive = false;
 
-const hostName = localStorage.getItem("nickname");
-const roomID = localStorage.getItem("roomId");
+const hostName = localStorage.getItem("nickname") || "ホスト";
+const roomID = localStorage.getItem("roomId") || "未設定";
 document.getElementById("hostName").textContent = hostName;
 document.getElementById("roomID").textContent = roomID;
 
@@ -13,42 +14,62 @@ fetch("questions.json")
   .then(res => res.json())
   .then(data => questions = data);
 
-document.getElementById("showQuestionBtn").addEventListener("click", () => {
+const showQuestionBtn = document.getElementById("showQuestionBtn");
+showQuestionBtn.addEventListener("click", () => {
+  if (questionActive) return;
+
   let unused = questions.filter(q => !usedQuestions.has(q.question));
   if (unused.length === 0) {
     alert("すべての問題を出題しました！");
     return;
   }
+
   const random = unused[Math.floor(Math.random() * unused.length)];
   currentQuestion = random.question;
   usedQuestions.add(currentQuestion);
-  document.getElementById("questionArea").textContent = currentQuestion;
   answerOrder = [];
-  document.getElementById("answerOrder").textContent = "";
+  updateAnswerOrder();
+
+  alert(`出題：\n${currentQuestion}`); // 出題者にだけ表示
+  document.getElementById("questionArea").textContent = "問題が表示されました（出題者にのみ）";
+
+  questionActive = true;
+  showQuestionBtn.disabled = true;
 });
 
 function recordAnswer() {
   const name = prompt("あなたの名前を入力してください");
   if (!name) return;
-  answerOrder.push(name);
-  document.getElementById("answerOrder").textContent = "回答順：" + answerOrder.join(" → ");
+
   if (!scores[name]) {
     scores[name] = 0;
     addToScoreTable(name);
   }
+
+  answerOrder.push(name);
+  updateAnswerOrder();
+}
+
+function updateAnswerOrder() {
+  const display = answerOrder.length > 0 ? answerOrder.join(" → ") : "なし";
+  document.getElementById("answerOrder").textContent = "回答順：" + display;
 }
 
 function judge(isCorrect) {
-  if (answerOrder.length === 0) return;
+  if (!questionActive || answerOrder.length === 0) return;
+
   const answerer = answerOrder.shift();
   if (isCorrect) {
     scores[answerer]++;
-    scores[hostName] = scores[hostName] || 0;
-    scores[hostName]++;
+    scores[hostName] = (scores[hostName] || 0) + 1;
   }
+
   updateScores();
+  updateAnswerOrder();
   checkWinner();
-  document.getElementById("answerOrder").textContent = "回答順：" + answerOrder.join(" → ");
+
+  questionActive = false;
+  showQuestionBtn.disabled = false;
 }
 
 function addToScoreTable(name) {
@@ -79,7 +100,7 @@ function updateScores() {
 function checkWinner() {
   for (let name in scores) {
     if (scores[name] >= 10) {
-      document.getElementById("winnerArea").textContent = `${name}が優勝しました！🎉`;
+      document.getElementById("winnerArea").textContent = `${name} が優勝しました！🎉`;
     }
   }
 }
