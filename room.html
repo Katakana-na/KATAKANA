@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="UTF-8"><title>ルーム開始</title><link rel="stylesheet" href="style.css"></head>
+<head>
+  <meta charset="UTF-8">
+  <title>ルーム開始</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
   <h1>ルーム開始準備</h1>
   <p>ルームID: <span id="roomDisplay"></span></p>
+  <p>参加URL: <span id="urlDisplay"></span></p>
   <button onclick="start()">クイズを始める</button>
+
   <script>
-    document.getElementById("roomDisplay").textContent = localStorage.getItem("roomID") || "未設定";
+    const roomId = Math.random().toString(36).substring(2, 8);
+    localStorage.setItem("roomID", roomId);
+    document.getElementById("roomDisplay").textContent = roomId;
+    document.getElementById("urlDisplay").textContent = location.origin + "/join.html?roomID=" + roomId;
+
     function start() {
       location.href = "quiz.html";
     }
