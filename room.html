@@ -2,24 +2,120 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>ルーム開始</title>
+  <title>ルーム</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>ルーム開始準備</h1>
-  <p>ルームID: <span id="roomDisplay"></span></p>
-  <p>参加URL: <span id="urlDisplay"></span></p>
-  <button onclick="start()">クイズを始める</button>
+  <h1>カタカナクイズ：ルーム</h1>
+  <div id="info"></div>
+  <div id="questionArea"></div>
+  <div id="players"></div>
+  <div id="controls"></div>
 
   <script>
-    const roomId = Math.random().toString(36).substring(2, 8);
-    localStorage.setItem("roomID", roomId);
-    document.getElementById("roomDisplay").textContent = roomId;
-    document.getElementById("urlDisplay").textContent = location.origin + "/join.html?roomID=" + roomId;
+    const roomID = localStorage.getItem("roomID");
+    const playerName = localStorage.getItem("playerName");
 
-    function start() {
-      location.href = "quiz.html";
+    let players = [];
+    let scores = {};
+    let usedIndexes = [];
+    let currentQuestion = "";
+    let currentIndex = -1;
+    let answerOrder = [];
+    let isHost = false;
+
+    if (!roomID || !playerName) {
+      alert("参加情報がありません。join.htmlから参加してください");
+      location.href = "join.html";
     }
+
+    if (!localStorage.getItem("players_" + roomID)) {
+      isHost = true;
+      players = [playerName];
+      scores[playerName] = 0;
+      localStorage.setItem("players_" + roomID, JSON.stringify(players));
+      localStorage.setItem("scores_" + roomID, JSON.stringify(scores));
+    } else {
+      players = JSON.parse(localStorage.getItem("players_" + roomID));
+      scores = JSON.parse(localStorage.getItem("scores_" + roomID));
+      if (!players.includes(playerName)) {
+        players.push(playerName);
+        scores[playerName] = 0;
+        localStorage.setItem("players_" + roomID, JSON.stringify(players));
+        localStorage.setItem("scores_" + roomID, JSON.stringify(scores));
+      }
+    }
+
+    function updateDisplay() {
+      document.getElementById("info").innerHTML = `<h2>プレイヤー一覧</h2>` + players.map(p => {
+        const score = scores[p] ?? 0;
+        return `<div>${p}：${score}点
+          <button onclick="changeScore('${p}', 1)">＋</button>
+          <button onclick="changeScore('${p}', -1)">－</button>
+        </div>`;
+      }).join("");
+
+      if (currentQuestion) {
+        document.getElementById("questionArea").innerHTML = `<h3>お題: ${currentQuestion}</h3>`;
+      }
+
+      document.getElementById("controls").innerHTML = isHost ? `
+        <button onclick="nextQuestion()">次の出題</button>
+        <button onclick="judge(true)">正解</button>
+        <button onclick="judge(false)">不正解</button>
+      ` : `<button onclick="answer()">回答する</button>`;
+    }
+
+    function nextQuestion() {
+      fetch("quiz.json").then(res => res.json()).then(data => {
+        do {
+          currentIndex = Math.floor(Math.random() * data.length);
+        } while (usedIndexes.includes(currentIndex));
+        usedIndexes.push(currentIndex);
+        currentQuestion = data[currentIndex].question;
+        answerOrder = [];
+        updateDisplay();
+      });
+    }
+
+    function answer() {
+      if (!answerOrder.includes(playerName)) {
+        answerOrder.push(playerName);
+        alert(`${playerName}が回答しました！（順番${answerOrder.length}番目）`);
+      }
+    }
+
+    function judge(correct) {
+      if (answerOrder.length === 0) {
+        alert("誰も回答していません");
+        return;
+      }
+      const current = answerOrder.shift();
+      if (correct) {
+        scores[current]++;
+        scores[playerName]++;
+        alert(`${current}が正解！`);
+      } else {
+        alert(`${current}は不正解`);
+      }
+      checkWinner();
+      updateDisplay();
+    }
+
+    function changeScore(name, delta) {
+      scores[name] = (scores[name] ?? 0) + delta;
+      updateDisplay();
+    }
+
+    function checkWinner() {
+      for (const [name, score] of Object.entries(scores)) {
+        if (score >= 10) {
+          alert(`${name}が10点に到達！優勝です🎉`);
+        }
+      }
+    }
+
+    updateDisplay();
   </script>
 </body>
 </html>
