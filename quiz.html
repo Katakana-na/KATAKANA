@@ -7,6 +7,7 @@
 </head>
 <body>
   <h1>クイズゲーム</h1>
+
   <div id="info">
     <p>ホスト名：<span id="hostName"></span></p>
     <p>ルームID：<span id="roomID"></span></p>
@@ -15,17 +16,16 @@
   <button id="showQuestionBtn">出題する</button>
   <div id="questionArea">ここにお題が表示されます</div>
 
-  <div id="answerSection">
-    <button onclick="recordAnswer()">回答する</button>
-    <div id="answerOrder"></div>
-  </div>
+  <h2>回答アクション</h2>
+  <button onclick="recordAnswer()">回答する</button>
+  <p id="answerOrder">回答順：なし</p>
 
   <div id="judgeSection">
     <button onclick="judge(true)">正解</button>
     <button onclick="judge(false)">不正解</button>
   </div>
 
-  <h2>参加者一覧と得点</h2>
+  <h2>プレイヤー一覧と得点</h2>
   <table id="scoreTable">
     <thead>
       <tr><th>名前</th><th>得点</th><th>＋</th><th>−</th></tr>
@@ -34,6 +34,7 @@
   </table>
 
   <div id="winnerArea"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
