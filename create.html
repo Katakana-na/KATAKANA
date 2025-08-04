@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>ルーム作成</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>ルームを作成しました</h1>
+  <p id="linkDisplay"></p>
+  <button onclick="copyLink()">URLをコピー</button>
+
+  <script>
+    const roomID = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const joinURL = location.origin + "/KATAKANA/join.html?roomID=" + roomID;
+    localStorage.setItem("roomID", roomID);
+    document.getElementById("linkDisplay").textContent = joinURL;
+
+    function copyLink() {
+      navigator.clipboard.writeText(joinURL);
+      alert("ルームURLをコピーしました！");
+    }
+  </script>
+</body>
+</html>
