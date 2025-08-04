@@ -4,6 +4,8 @@ const roomId = new URLSearchParams(location.search).get("roomId");
 const players = new Set();
 const answerOrder = [];
 let isQuestionActive = false;
+let questions = [];
+let currentQuestion = null;
 
 window.addEventListener("DOMContentLoaded", () => {
   if (!nickname) {
@@ -15,9 +17,16 @@ window.addEventListener("DOMContentLoaded", () => {
   players.add(nickname);
   updatePlayerList();
 
+  fetch("question.json")
+    .then(response => response.json())
+    .then(data => {
+      questions = data;
+    });
+
   document.getElementById("startQuestion").addEventListener("click", () => {
-    if (isQuestionActive) return;
-    startQuestion();
+    if (isQuestionActive || questions.length === 0) return;
+    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+    startQuestion(currentQuestion.question);
   });
 
   document.getElementById("answerBtn").addEventListener("click", () => {
@@ -45,11 +54,11 @@ function updateAnswerOrder() {
   container.innerHTML = `<h2>回答順</h2><ol>${answerOrder.map(name => `<li>${name}</li>`).join("")}</ol>`;
 }
 
-function startQuestion() {
+function startQuestion(text) {
   isQuestionActive = true;
   answerOrder.length = 0;
   updateAnswerOrder();
-  document.getElementById("questionArea").innerText = "出題：『富士山の高さは何メートル？』";
+  document.getElementById("questionArea").innerText = `出題：『${text}』`;
 }
 
 function endQuestion() {
