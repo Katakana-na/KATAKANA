@@ -1,11 +1,14 @@
 body {
-  text-align: center;
   font-family: sans-serif;
-  background: #eef;
-  margin: 40px;
+  padding: 20px;
+  background-color: #fdfafa;
+  text-align: center;
 }
-button {
+input, button {
+  font-size: 1em;
+  margin: 8px;
+  padding: 8px 16px;
+}
+#info div {
   margin: 5px;
-  padding: 10px 20px;
 }
-#players
