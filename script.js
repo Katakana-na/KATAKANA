@@ -1,83 +1,78 @@
-const nickname = localStorage.getItem("nickname");
-const roomId = new URLSearchParams(location.search).get("roomId");
+let name = localStorage.getItem("playerName");
+let room = localStorage.getItem("roomID");
+let scores = JSON.parse(localStorage.getItem("scores")) || {};
+let answered = [];
+let usedQuestions = [];
 
-const players = new Map(); // 名前 → 得点
-const answerOrder = [];
-let isQuestionActive = false;
-let questions = [];
-let currentQuestion = null;
+document.getElementById("roomDisplay").textContent = room;
+scores[name] = scores[name] || 0;
+localStorage.setItem("scores", JSON.stringify(scores));
+renderPlayers();
 
-window.addEventListener("DOMContentLoaded", () => {
-  if (!nickname) {
-    alert("名前が設定されていません。room.htmlに戻ります");
-    window.location.href = "room.html";
-    return;
+function renderPlayers() {
+  let html = "";
+  for (let p in scores) {
+    html += `${p}: ${scores[p]} 点 
+      <button onclick="changeScore('${p}',1)">＋</button>
+      <button onclick="changeScore('${p}',-1)">−</button><br>`;
   }
+  document.getElementById("players").innerHTML = html;
+}
 
-  if (!players.has(nickname)) {
-    players.set(nickname, 0);
-  }
+function changeScore(p, delta) {
+  scores[p] = (scores[p] || 0) + delta;
+  localStorage.setItem("scores", JSON.stringify(scores));
+  renderPlayers();
+  checkWinner();
+}
 
-  updatePlayerList();
-  updateScoreBoard();
-
+function startQuestion() {
+  if (answered.length > 0) return alert("前の回答を判定してください");
   fetch("questions.json")
     .then(res => res.json())
     .then(data => {
-      questions = data;
+      let pool = data.filter(q => !usedQuestions.includes(q));
+      if (pool.length === 0) {
+        usedQuestions = [];
+        pool = data;
+      }
+      let q = pool[Math.floor(Math.random() * pool.length)];
+      usedQuestions.push(q);
+      alert("出題（出題者にのみ表示）: " + q);
+      document.getElementById("question").textContent = "出題中...";
     });
+}
 
-  document.getElementById("startQuestion").addEventListener("click", () => {
-    if (isQuestionActive || questions.length === 0) return;
-    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-    alert(`出題：『${currentQuestion.question}』`);
-    startQuestion(currentQuestion.question);
-  });
+function answer() {
+  if (answered.includes(name)) return alert("すでに回答しています");
+  answered.push(name);
+  document.getElementById("answers").innerHTML = answered.join("<br>");
+}
 
-  document.getElementById("answerBtn").addEventListener("click", () => {
-    if (!isQuestionActive || answerOrder.includes(nickname)) return;
-    answerOrder.push(nickname);
-    updateAnswerOrder();
-  });
+function correct() {
+  if (answered.length === 0) return alert("回答者がいません");
+  let correctUser = answered.shift();
+  scores[correctUser] = (scores[correctUser] || 0) + 1;
+  scores[name] = (scores[name] || 0) + 1;
+  document.getElementById("answers").innerHTML = answered.join("<br>");
+  localStorage.setItem("scores", JSON.stringify(scores));
+  renderPlayers();
+  checkWinner();
+  document.getElementById("question").textContent = "";
+}
 
-  document.getElementById("judgeCorrect").addEventListener("click", () => {
-    if (!isQuestionActive) return;
-    const first = answerOrder[0];
-    if (first && players.has(first)) {
-      players.set(first, players.get(first) + 1);
+function incorrect() {
+  answered.shift();
+  document.getElementById("answers").innerHTML = answered.join("<br>");
+  if (answered.length === 0) {
+    document.getElementById("question").textContent = "";
+  }
+}
+
+function checkWinner() {
+  for (let p in scores) {
+    if (scores[p] >= 10) {
+      document.getElementById("winner").textContent = `${p}が10点達成！優勝🎉`;
     }
-    endQuestion();
-  });
-
-  document.getElementById("judgeIncorrect").addEventListener("click", () => {
-    endQuestion();
-  });
-});
-
-function updatePlayerList() {
-  const container = document.getElementById("playerList");
-  container.innerHTML = `<h2>参加者</h2><ul>${[...players.keys()].map(p => `<li>${p}</li>`).join("")}</ul>`;
-}
-
-function updateScoreBoard() {
-  const container = document.getElementById("scoreBoard");
-  container.innerHTML = `<h2>得点</h2><ul>${[...players.entries()].map(([name, score]) => `<li>${name}: ${score}点</li>`).join("")}</ul>`;
-}
-
-function updateAnswerOrder() {
-  const container = document.getElementById("answerOrder");
-  container.innerHTML = `<h2>回答順</h2><ol>${answerOrder.map(name => `<li>${name}</li>`).join("")}</ol>`;
-}
-
-function startQuestion(text) {
-  isQuestionActive = true;
-  answerOrder.length = 0;
-  updateAnswerOrder();
-  document.getElementById("questionArea").innerText = `出題：『${text}』`;
-}
-
-function endQuestion() {
-  isQuestionActive = false;
-  document.getElementById("questionArea").innerText = "出題終了";
-  updateScoreBoard();
+  }
 }
