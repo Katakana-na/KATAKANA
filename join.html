@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head><meta charset="UTF-8"><title>参加</title><link rel="stylesheet" href="style.css"></head>
+<head>
+  <meta charset="UTF-8">
+  <title>参加</title>
+  <link rel="stylesheet" href="style.css">
+</head>
 <body>
   <h1>名前を入力</h1>
   <input type="text" id="name" placeholder="名前">
   <button onclick="join()">参加する</button>
+
   <script>
+    const params = new URLSearchParams(location.search);
+    const roomID = params.get("roomID");
+
     function join() {
       const name = document.getElementById("name").value.trim();
-      const url = new URL(location.href);
-      const roomID = url.searchParams.get("room");
       if (name && roomID) {
         localStorage.setItem("playerName", name);
         localStorage.setItem("roomID", roomID);
