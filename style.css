@@ -1,21 +1,21 @@
 body {
   font-family: sans-serif;
+  background: #fafafa;
   padding: 20px;
-  background: #f5f5f5;
 }
 
 h1 {
   font-size: 24px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 button {
-  margin: 10px 5px;
-  padding: 8px 16px;
+  margin: 5px;
+  padding: 10px 20px;
   font-size: 16px;
 }
 
-#playerList, #answerOrder, #questionArea {
+#playerList, #questionArea, #answerOrder {
   margin: 20px 0;
   background: #fff;
   padding: 10px;
