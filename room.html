@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>ルーム</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDKを読み込み -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js"></script>
 </head>
 <body>
   <h1>カタカナクイズ：ルーム</h1>
@@ -13,6 +17,21 @@
   <div id="controls"></div>
 
   <script>
+    // Firebaseの設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyBnNXAZlKVMIT6DMeOqOF_jVn2EKLOYBww",
+      authDomain: "katakana-db0a4.firebaseapp.com",
+      databaseURL: "https://katakana-db0a4-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "katakana-db0a4",
+      storageBucket: "katakana-db0a4.firebasestorage.app",
+      messagingSenderId: "356896375162",
+      appId: "1:356896375162:web:a96bec82ca7ab440d996c3"
+    };
+
+    // Firebase初期化
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
     const roomID = localStorage.getItem("roomID");
     const playerName = localStorage.getItem("playerName");
 
@@ -24,24 +43,33 @@
     let answerOrder = [];
     let isHost = false;
 
+    const roomRef = db.ref("rooms/" + roomID);
+
     if (!roomID || !playerName) {
       alert("参加情報がありません。join.htmlから参加してください");
       location.href = "join.html";
     }
 
-    if (!localStorage.getItem("players_" + roomID)) {
-      isHost = true;
-      players = [playerName];
+    // Firebaseにプレイヤー登録
+    roomRef.child("players").push(playerName);
+
+    // Firebaseからプレイヤー一覧を取得（リアルタイム反映）
+    roomRef.child("players").on("value", snapshot => {
+      const firebasePlayers = snapshot.val();
+      if (firebasePlayers) {
+        players = Object.values(firebasePlayers);
+        updateDisplay();
+      }
+    });
+
+    // スコアはローカル管理（簡易版） ※後でFirebase対応も可能
+    if (!localStorage.getItem("scores_" + roomID)) {
       scores[playerName] = 0;
-      localStorage.setItem("players_" + roomID, JSON.stringify(players));
       localStorage.setItem("scores_" + roomID, JSON.stringify(scores));
     } else {
-      players = JSON.parse(localStorage.getItem("players_" + roomID));
       scores = JSON.parse(localStorage.getItem("scores_" + roomID));
-      if (!players.includes(playerName)) {
-        players.push(playerName);
+      if (!scores[playerName]) {
         scores[playerName] = 0;
-        localStorage.setItem("players_" + roomID, JSON.stringify(players));
         localStorage.setItem("scores_" + roomID, JSON.stringify(scores));
       }
     }
@@ -104,6 +132,7 @@
 
     function changeScore(name, delta) {
       scores[name] = (scores[name] ?? 0) + delta;
+      localStorage.setItem("scores_" + roomID, JSON.stringify(scores));
       updateDisplay();
     }
 
